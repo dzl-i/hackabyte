@@ -39,11 +39,11 @@ const transcribeAudio = async (audioBuffer) => {
   try {
     const response = await fetch(""); // TODO: Check out https://api.openai.com/v1/audio/transcriptions
     
-    if (!response.ok) { throw new Error('Transcription failed'); }
+    if (!response.ok) throw { status: 500, message: "An error occurred during transcription." };
     const data: any = await response.json();
     
     return data.data.text; // TODO: idk if the response is in this format lol
   } catch (error: any) {
-    throw new Error('Transcription failed');
+    throw { status: 500, message: "An error occurred." };
   }
 };
