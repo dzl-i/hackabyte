@@ -6,9 +6,9 @@ import LectureItem from "@/components/LectureItem";
 import NavBar from "@/components/NavBar";
 
 const lectures = [
-  { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { title: "yippee", lastUpdated: "Uploaded 1 hour ago" },
+  { id: "1", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  { id: "2", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  { id: "3", name: "yippee", lastUpdated: "Uploaded 1 hour ago" },
 ];
 
 export default function Page() {
@@ -17,7 +17,7 @@ export default function Page() {
   const memoizedLectures = useMemo(
     () =>
       lectures.filter((lecture) =>
-        lecture.title.toLowerCase().includes(searchText.toLowerCase())
+        lecture.name.toLowerCase().includes(searchText.toLowerCase())
       ),
     [lectures, searchText]
   );
