@@ -1,13 +1,27 @@
+"use client";
 import { Video } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Captions } from "lucide-react";
 import StarGrid from "@/components/StarGrid";
 import { Bakbak_One, Azeret_Mono } from "next/font/google";
+import { useRouter } from "next/navigation";
+import LectureItem from "@/components/LectureItem";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
 
 export default function Home() {
+  const router = useRouter();
+
+  const lectures = [
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  ];
+
   return (
     <main className="flex flex-col justify-evenly items-center min-h-screen overflow-hidden p-6 py-16 gap-16">
       <StarGrid />
@@ -63,32 +77,18 @@ export default function Home() {
         <div className="flex justify-between items-center">
           <p className="text-xl font-bold text-white">Past Submissions</p>
 
-          <button className="flex text-white items-center hover:underline duration-200 gap-1 cursor-pointer">
+          <button
+            className="flex text-white items-center hover:underline duration-200 gap-1 cursor-pointer"
+            onClick={() => router.push("/lectures")}
+          >
             See More <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-2 w-full">
-          <div className="flex flex-col bg-[#262934] hover:bg-[#1c1e27] duration-200 w-full py-3 px-4 gap-y-1 rounded-md">
-            <p className="text-md font-bold text-white">
-              Rule & Utalitarianism
-            </p>
-            <p className="text-sm text-zinc-500">Uploaded an hour ago</p>
-          </div>
-          <div className="flex flex-col bg-[#262934] hover:bg-[#1c1e27] duration-200 w-full py-3 px-4 gap-y-1 rounded-md">
-            <h6 className="text-md font-bold text-white">
-              Rule & Utalitarianism
-            </h6>
-
-            <p className="text-sm text-zinc-500">Uploaded an hour ago</p>
-          </div>
-          <div className="flex flex-col bg-[#262934] hover:bg-[#1c1e27] duration-200 w-full py-3 px-4 gap-y-1 rounded-md">
-            <h6 className="text-md font-bold text-white">
-              Rule & Utalitarianism
-            </h6>
-
-            <p className="text-sm text-zinc-500">Uploaded an hour ago</p>
-          </div>
+          {lectures.map((lecture, index) => (
+            <LectureItem key={index} lecture={lecture} />
+          ))}
         </div>
       </div>
     </main>
