@@ -16,6 +16,7 @@ import path from 'path';
 import { lectureDetails } from './lecture/details';
 import { lectureUploadTranscript } from './lecture/uploadTranscript';
 import { lectureUploadVideo } from './lecture/uploadVideo';
+import { lectureFlashcard } from './lecture/flashcard';
 
 
 interface MulterRequest extends Request {
@@ -98,6 +99,20 @@ app.post('/lecture/video', upload.single('file'), async (req: MulterRequest, res
     const lecture = await lectureUploadVideo(title, video);
 
     res.status(200).json(lecture);
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ error: error.message || "An error occurred." });
+  }
+});
+
+// Create a new flashcard based on selected text
+app.post('/lecture/flashcard', async (req: Request, res: Response) => {
+  try {
+    const { sectionId, text } = req.body;
+
+    const flashcard = await lectureFlashcard(sectionId, text);
+
+    res.status(200).json(flashcard);
   } catch (error: any) {
     console.error(error);
     res.status(error.status || 500).json({ error: error.message || "An error occurred." });
