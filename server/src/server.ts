@@ -11,6 +11,7 @@ import { Server } from 'http';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import { lectureDetails } from './lecture/details';
 
 
 // Route imports
@@ -48,6 +49,19 @@ app.get('/', async (req: Request, res: Response) => {
   res.status(200).json({
     message: "Server is up!"
   });
+});
+
+// LECTURE ROUTE
+app.get('/lecture/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const lecture = await lectureDetails(id);
+
+    res.status(200).json(lecture);
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ error: error.message || "An error occurred." });
+  }
 });
 
 
