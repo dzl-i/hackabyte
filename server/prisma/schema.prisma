@@ -17,6 +17,7 @@ model Lecture {
   id         String      @id @default(uuid())
   title      String
   transcript String
+  summary    String
   flashcards Flashcard[]
   graph      String
   createdAt  DateTime    @default(now())
