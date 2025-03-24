@@ -1,10 +1,7 @@
-import Image from "next/image";
-import { Button } from "../components/ui/button";
 import { Video } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Captions } from "lucide-react";
 import StarGrid from "@/components/StarGrid";
-
 import { Bakbak_One, Azeret_Mono } from "next/font/google";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
@@ -12,7 +9,7 @@ const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-evenly items-center h-screen overflow-hidden p-6 py-16 gap-16">
+    <main className="flex flex-col justify-evenly items-center min-h-screen overflow-hidden p-6 py-16 gap-16">
       <StarGrid />
       {/* Headline */}
       <div className="text-center">
@@ -94,6 +91,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
