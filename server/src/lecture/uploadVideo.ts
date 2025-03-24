@@ -15,7 +15,6 @@ export async function lectureUploadVideo(title: string, video: Express.Multer.Fi
   return lecture;
 }
 
-// Convert MP4 Buffer to MP3 using FFmpeg
 const convertToMp3 = (buffer) => {
   return new Promise((resolve, reject) => {
     const inputStream = new stream.PassThrough();
@@ -39,11 +38,12 @@ const transcribeAudio = async (audioBuffer) => {
   // TODO: Check out https://platform.openai.com/docs/guides/speech-to-text?lang=javascript - can we use this?
   try {
     const response = await fetch(""); // TODO: Check out https://api.openai.com/v1/audio/transcriptions
+    
     if (!response.ok) { throw new Error('Transcription failed'); }
     const data: any = await response.json();
-    return data.data.text;
+    
+    return data.data.text; // TODO: idk if the response is in this format lol
   } catch (error: any) {
-      console.error('Error in transcription:', error.response?.data || error.message);
-      throw new Error('Transcription failed');
+    throw new Error('Transcription failed');
   }
 };
