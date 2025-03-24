@@ -10,14 +10,14 @@ export async function lectureFlashcard(sectionId: string, text: string) {
       body: JSON.stringify({ text: text })
     });
     
-    if (!response.ok) throw new Error('Flashcard generation failed');
+    if (!response.ok) throw { status: 500, message: "Flashcard generation failed" };
     const data: any = await response.json();
     
     const flashcard = await createFlashcard(sectionId, data.question, data.answer); // TODO: also check if this is the correct format
-    if (flashcard === null) throw new Error('Flashcard creation failed');
+    if (flashcard === null) throw { status: 500, message: "Flashcard generation failed" };
 
     return flashcard;
   } catch (error: any) {
-    throw new Error('Flashcard generation failed');
+    throw { status: 500, message: "An error occurred." };
   }
 }
