@@ -33,7 +33,6 @@ model Section {
 
 model Flashcard {
   id        String  @id @default(uuid())
-  topic     String
   question  String
   answer    String
   section   Section @relation(fields: [sectionId], references: [id])
