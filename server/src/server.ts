@@ -4,25 +4,29 @@ import morgan from 'morgan';
 import errorHandler from 'middleware-http-errors';
 import cors from 'cors';
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
 import { Server } from 'http';
+import multer from 'multer';
 
 // Swagger
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
-import { lectureDetails } from './lecture/details';
-
 
 // Route imports
+import { lectureDetails } from './lecture/details';
+import { lectureUploadTranscript } from './lecture/uploadTranscript';
 
 
-// Database client
-const prisma = new PrismaClient();
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
 
 // Set up web app using JSON
 const app = express();
 app.use(express.json({ limit: '50mb' }));
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const httpServer = new Server(app);
 
@@ -51,11 +55,29 @@ app.get('/', async (req: Request, res: Response) => {
   });
 });
 
-// LECTURE ROUTE
+// LECTURE ROUTES
+
+// Get lecture details
 app.get('/lecture/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const lecture = await lectureDetails(id);
+
+    res.status(200).json(lecture);
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ error: error.message || "An error occurred." });
+  }
+});
+
+// Upload lecture transcript
+app.post('/lecture/transcript', upload.single('file'), async (req: MulterRequest, res: Response) => {
+  try {
+    const id = req.body.id;
+    const title = req.file?.originalname || '';
+    const transcript = req.file?.buffer.toString('utf8') || '';
+
+    const lecture = await lectureUploadTranscript(title, transcript);
 
     res.status(200).json(lecture);
   } catch (error: any) {

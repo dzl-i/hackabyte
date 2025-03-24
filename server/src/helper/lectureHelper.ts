@@ -15,3 +15,41 @@ export async function getLectureDetail(id: string) {
     },
   });
 }
+
+export async function createLecture(title: string) {
+  return await prisma.lecture.create({
+    data: {
+      title: title,
+    }
+  });
+}
+
+export async function createSection(lectureId: string, title: string, transcript: string, summary: string, graph: string) {
+  return await prisma.section.create({
+    data: {
+      title: title,
+      transcript: transcript,
+      summary: summary,
+      graph: graph,
+      lecture: {
+        connect: {
+          id: lectureId
+        }
+      }
+    }
+  });
+}
+
+export async function createFlashcard(sectionId: string, question: string, answer: string) {
+  return await prisma.flashcard.create({
+    data: {
+      question: question,
+      answer: answer,
+      section: {
+        connect: {
+          id: sectionId
+        }
+      }
+    }
+  });
+}
