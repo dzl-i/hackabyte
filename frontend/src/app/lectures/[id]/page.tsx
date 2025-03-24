@@ -2,7 +2,7 @@
 
 import NavBar from "@/components/NavBar";
 import { ArrowLeft, Captions, Heart, Layers } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import React, { useState } from "react";
 
 export type LectureTabs = {
@@ -31,8 +31,11 @@ const lectureTabs = [
 
 export default function Page() {
   const router = useRouter();
+  const params = useParams();
 
   const [selectedTab, setSelectedTab] = useState(lectureTabs[0]);
+
+  console.log(params.id);
 
   return (
     <main>

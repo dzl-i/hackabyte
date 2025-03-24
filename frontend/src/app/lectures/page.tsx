@@ -1,26 +1,45 @@
-import React from "react";
+"use client";
+
+import React, { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import LectureItem from "@/components/LectureItem";
 import NavBar from "@/components/NavBar";
 
-function page() {
-  const lectures = [
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  ];
+const lectures = [
+  { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  { title: "yippee", lastUpdated: "Uploaded 1 hour ago" },
+];
+
+export default function Page() {
+  const [searchText, setSearchText] = useState("");
+
+  const memoizedLectures = useMemo(
+    () =>
+      lectures.filter((lecture) =>
+        lecture.title.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [lectures, searchText]
+  );
 
   return (
     <div>
       <NavBar />
 
-      <div className="flex flex-col justify-center w-full max-w-4xl mx-auto min-h-screen overflow-hidden p-6 py-16 gap-16">
+      <div className="flex flex-col items-center w-full max-w-4xl mx-auto min-h-screen overflow-hidden px-6 py-8 gap-6">
         <div className="flex flex-row bg-[#1C1C24] w-full h-12 items-center pl-4 rounded-md gap-x-2 text-[#FFFEFD]/50">
-          <Search size={16} className="text-white" /> Search...
+          <Search size={16} className="text-white" />
+          <input
+            className="w-full outline-none"
+            type="text"
+            placeholder="Search..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2 w-full">
-          {lectures.map((lecture, index) => (
+          {memoizedLectures.map((lecture, index) => (
             <LectureItem key={index} lecture={lecture} />
           ))}
         </div>
@@ -28,5 +47,3 @@ function page() {
     </div>
   );
 }
-
-export default page;
