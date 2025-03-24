@@ -1,0 +1,44 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx prisma migrate deploy && node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/eslint": "^9.6.1",
+    "@types/express": "^5.0.1",
+    "@types/http-errors": "^2.0.4",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.13.13",
+    "eslint": "^9.23.0",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "http-errors": "^2.0.0",
+    "middleware-http-errors": "^0.1.2",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^5.0.1",
+    "sync-request": "^6.1.0",
+    "ts-node": "^10.9.2",
+    "yamljs": "^0.3.0"
+  }
+}
