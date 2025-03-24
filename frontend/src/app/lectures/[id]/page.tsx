@@ -2,14 +2,21 @@
 
 import NavBar from "@/components/NavBar";
 import { ArrowLeft, Captions, Heart, Layers } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import FlashCard from "@/components/FlashCard";
 
 export type LectureTabs = {
   name: string;
   icon: React.ReactNode;
   content: React.ReactNode;
 };
+
+const flashcards = [
+  { question: "how is merry's mental state?", answer: "not good" },
+  { question: "how is merry's mental state?", answer: "not good" },
+  { question: "how is merry's mental state?", answer: "not good" },
+];
 
 const lectureTabs = [
   {
@@ -25,24 +32,35 @@ const lectureTabs = [
   {
     name: "Flashcards",
     icon: Layers,
-    content: <p className="text-white">Flashcards</p>,
+    content: (
+      <div className="px-4">
+        <h4 className="text-lg font-bold text-white mb-4">Flashcards</h4>
+
+        <div className="space-y-4">
+          {flashcards.map((flashcard, index) => (
+            <FlashCard
+              key={index}
+              question={flashcard.question}
+              answer={flashcard.answer}
+            />
+          ))}
+        </div>
+      </div>
+    ),
   },
 ];
 
 export default function Page() {
   const router = useRouter();
-  const params = useParams();
 
   const [selectedTab, setSelectedTab] = useState(lectureTabs[0]);
-
-  console.log(params.id);
 
   return (
     <main>
       <NavBar />
       <main className="p-6 flex gap-8">
         {/* List of sections */}
-        <section className="space-y-6">
+        <section className="space-y-6 flex-1 min-w-[220px]">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 rounded-lg text-white cursor-pointer"
@@ -62,7 +80,7 @@ export default function Page() {
             </div>
           </div>
         </section>
-        <section className="space-y-4">
+        <section className="space-y-4 w-full">
           <h1 className="text-white font-bold text-2xl">
             Rule & Act Utilitarianism
           </h1>
@@ -81,6 +99,7 @@ export default function Page() {
               </button>
             ))}
           </div>
+
           {selectedTab.content}
         </section>
       </main>
