@@ -1,13 +1,17 @@
 import { Captions, Video } from "lucide-react";
 import { Bakbak_One } from "next/font/google";
+import { useRouter } from "next/navigation";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 
 export default function NavBar() {
+  const router = useRouter();
+
   return (
     <nav className="flex justify-between items-center py-4 px-6 border border-b border-white/15">
       <h1
-        className={`text-white font-bold text-2xl uppercase ${bakbak.className}`}
+        onClick={() => router.push("/")}
+        className={`text-white font-bold text-2xl uppercase cursor-pointer ${bakbak.className}`}
       >
         SmartScribe
       </h1>
