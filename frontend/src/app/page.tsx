@@ -64,7 +64,7 @@ export default function Home() {
           <p className="text-xl font-bold text-white">Past Submissions</p>
 
           <button className="flex text-white items-center hover:underline duration-200 gap-1 cursor-pointer">
-            See More <ArrowRight size={20} />
+            See More <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
