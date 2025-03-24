@@ -14,14 +14,21 @@ datasource db {
 }
 
 model Lecture {
+  id        String    @id @default(uuid())
+  title     String
+  sections  Section[]
+  createdAt DateTime  @default(now())
+}
+
+model Section {
   id         String      @id @default(uuid())
   title      String
   transcript String
   summary    String
   flashcards Flashcard[]
   graph      String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  lecture    Lecture     @relation(fields: [lectureId], references: [id])
+  lectureId  String
 }
 
 model Flashcard {
@@ -29,6 +36,6 @@ model Flashcard {
   topic     String
   question  String
   answer    String
-  lecture   Lecture @relation(fields: [lectureId], references: [id])
-  lectureId String
+  section   Section @relation(fields: [sectionId], references: [id])
+  sectionId String
 }
