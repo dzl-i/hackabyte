@@ -1,13 +1,8 @@
+import { summarizeLecture } from "../gpt";
 import { createFlashcard, createLecture, createSection, getLectureDetail } from "../helper/lectureHelper";
 
 export async function lectureUploadTranscript(title: string, transcript: string) {
-  const result: any = await fetch(`chatgpt`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ transcript: transcript })
-  }); // TODO: Replace with ChatGPT API endpoint
+  const result: any = await summarizeLecture(transcript); // ChatGPT api call
 
   if (result.status !== 200) throw { status: 500, message: "An error occurred." };
   const response = await result.json();
