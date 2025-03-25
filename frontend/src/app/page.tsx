@@ -8,6 +8,7 @@ import { Bakbak_One, Azeret_Mono } from "next/font/google";
 import { useRouter } from "next/navigation";
 import LectureItem from "@/components/LectureItem";
 import { toast } from "sonner";
+import { request } from "../hooks/useRequest";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
@@ -27,27 +28,44 @@ export default function Home() {
     { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
   ];
 
-  const uploadVideo = async () => {
-    try {
-      const res = await fetch("/lecture/video", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  const uploadVideo = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
 
-      const data = await res.json();
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("file", files[0]);
 
-      console.log("data " + data);
+    const { data, error } = await request("POST", "/lecture/video", formData);
 
-      // setSubmissions((prev) -> [...prev, data])
-
-      toast("Video successfully uploaded!");
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+    if (error) {
+      toast("Error uploading video");
     }
+
+    toast("Video successfully uploaded!");
+  };
+
+  const uploadTranscript = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("file", files[0]);
+
+    const { data, error } = await request(
+      "POST",
+      "/lecture/transcript",
+      formData
+    );
+
+    if (error) {
+      toast("Error uploading transcript");
+    }
+
+    toast("Transcript successfully uploaded!");
   };
 
   const getSubmissions = async () => {
@@ -100,6 +118,7 @@ export default function Home() {
             type="file"
             className="hidden"
             accept=".mp4"
+            onChange={uploadVideo}
           ></input>
         </label>
 
@@ -116,6 +135,7 @@ export default function Home() {
             type="file"
             className="hidden"
             accept=".vtt"
+            onChange={uploadTranscript}
           ></input>
         </label>
       </div>
