@@ -4,11 +4,11 @@ import { OpenAI } from "openai";
 const PORT = 8000;
 
 const openAI = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const embeddingFunction = new OpenAIEmbeddingFunction({
-  openai_api_key: process.env.OPEN_AI_API_KEY,
+  openai_api_key: process.env.OPENAI_API_KEY,
   openai_model: "text-embedding-3-small",
 });
 
@@ -19,103 +19,105 @@ export const chromaClient = new ChromaClient({
 export type Transcript = {
   text: string;
   timestamp: string;
-  lectureId: string;
 };
 
-export type Cluster = {
-    text: string;
-    timestamp: string;
-}
+export type VectorisedObject = {
+  text: string;
+  timestamp: string;
+  embedding: number[];
+};
 
-export const groupTranscripts = async (lectureId: string) => {
-  const lectureCollection = await initializeCollection();
+export const groupTranscripts = async (transcript: string) => {
+  // Process transcript string into transcript object
+  const transcripts: Transcript[] = parseTranscripts(transcript);
 
-  const transcripts = await lectureCollection.get({
-    where: { lectureId },
-    // @ts-ignore
-    include: ["documents", "metadatas", "embeddings"],
-  });
+  // Vectorize every transcript object
+  const vectorisedObjects: VectorisedObject[] = await Promise.all(
+    transcripts.map(async (transcript) => {
+      const response = await openAI.embeddings.create({
+        model: "text-embedding-3-small",
+        input: transcript.text,
+      });
 
-  clustersTranscripts(
-    transcripts.documents,
-    transcripts.metadatas,
-    transcripts.embeddings,
-    0.75
+      return {
+        text: transcript.text,
+        timestamp: transcript.timestamp,
+        embedding: response.data[0].embedding,
+      };
+    })
   );
-};
 
-const clustersTranscripts = (documents, metadatas, embeddings, threshold) => {
   // Initialize clusters
-  let clusters: Cluster[][] = [];
+  let clusters: Transcript[][] = [];
   let processedIndices = new Set();
+  const threshold = 0.75;
 
   // Process each segment
-  for (let i = 0; i < documents.length; i++) {
+  for (let i = 0; i < vectorisedObjects.length; i++) {
     // Skip already processed segments
     if (processedIndices.has(i)) continue;
 
     // Create a new cluster with this segment
-    let cluster: Cluster[] = [
+    let cluster: Transcript[] = [
       {
-        text: documents[i],
-        timestamp: metadatas[i].timestamp,
+        text: vectorisedObjects[i].text,
+        timestamp: vectorisedObjects[i].timestamp,
       },
     ];
 
     processedIndices.add(i);
 
     // Find similar segments
-    for (let j = 0; j < documents.length; j++) {
+    for (let j = 0; j < vectorisedObjects.length; j++) {
       if (i === j || processedIndices.has(j)) continue;
 
       // Calculate cosine similarity between embeddings
       const similarity = calculateCosineSimilarity(
-        embeddings[i],
-        embeddings[j]
+        vectorisedObjects[i].embedding,
+        vectorisedObjects[j].embedding
       );
 
       // If similarity is above threshold, add to this cluster
       if (similarity >= threshold) {
         cluster.push({
-          text: documents[j],
-          timestamp: metadatas[j].timestamp,
+          text: vectorisedObjects[j].text,
+          timestamp: vectorisedObjects[j].timestamp,
         });
         processedIndices.add(j);
       }
     }
 
     // Sort segments by timestamp
-    cluster.sort((a: Cluster, b: Cluster) =>
+    cluster.sort((a: Transcript, b: Transcript) =>
       a.timestamp.localeCompare(b.timestamp)
     );
 
     clusters.push(cluster);
   }
 
-  console.log(JSON.stringify(clusters));
+  return JSON.stringify(clusters);
 };
 
-export const addTranscripts = async (transcripts: Transcript[]) => {
-  const lectureCollection = await initializeCollection();
+const parseTranscripts = (transcript: string): Transcript[] => {
+  const lines = transcript.trim().split("\n");
 
-  // Add transcripts to collection
-  await lectureCollection.add({
-    ids: transcripts.map((transcript) => transcript.timestamp),
-    metadatas: transcripts.map((transcript) => ({
-      timestamp: transcript.timestamp,
-    })),
-    documents: transcripts.map((transcript) => transcript.text),
-  });
-};
+  const parsed: Transcript[] = [];
 
-const initializeCollection = async () => {
-  const lectureCollection = await chromaClient.getOrCreateCollection({
-    name: "lecture_Transcripts",
-    metadata: { "hnsw:space": "cosine" },
-    embeddingFunction,
-  });
+  // Process each line
+  for (const line of lines) {
+    // This pattern looks for anything up to the first space as timestamp,
+    // and everything after as text
+    const match = line.match(/^(\S+)\s+(.+)$/);
 
-  return lectureCollection;
+    if (match) {
+      parsed.push({
+        timestamp: match[1],
+        text: match[2],
+      });
+    }
+  }
+
+  return parsed;
 };
 
 const calculateCosineSimilarity = (vecA: number[], vecB: number[]) => {
