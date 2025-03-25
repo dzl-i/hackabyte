@@ -114,12 +114,17 @@ export default function Page() {
 
 	const selectedTab = lectureTabs[selectedTabIndex]
 
+	function truncate(str: string) {
+		const limit = 25
+		return str.length > limit ? str.slice(0, limit) + "…" : str
+	}
+
 	return (
 		<main>
 			<NavBar />
 			<main className="p-6 flex gap-8">
 				{/* Sidebar: Topics */}
-				<section className="space-y-6 flex-1 min-w-[220px]">
+				<section className="space-y-6 flex-1 min-w-[280px]">
 					<button
 						onClick={() => router.back()}
 						className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 rounded-lg text-white cursor-pointer"
@@ -139,7 +144,7 @@ export default function Page() {
 											: "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
 									}`}
 								>
-									<p>{section.name}</p>
+									<p>{truncate(section.name)}</p>
 								</button>
 							))}
 						</div>
