@@ -17,6 +17,7 @@ import { lectureDetails } from './lecture/details';
 import { lectureUploadTranscript } from './lecture/uploadTranscript';
 import { lectureUploadVideo } from './lecture/uploadVideo';
 import { lectureFlashcard } from './lecture/flashcard';
+import { processVTT } from './lecture/vttRefiner';
 
 
 interface MulterRequest extends Request {
@@ -77,9 +78,10 @@ app.post('/lecture/transcript', upload.single('file'), async (req: MulterRequest
   try {
     const id = req.body.id;
     const title = req.file?.originalname || '';
-    const transcript = req.file?.buffer.toString('utf8') || '';
+    const rawTranscript = req.file?.buffer.toString('utf8') || '';
 
-    const lecture = await lectureUploadTranscript(title, transcript);
+    const refinedTranscript = processVTT(rawTranscript);
+    const lecture = await lectureUploadTranscript(title, refinedTranscript);
 
     res.status(200).json(lecture);
   } catch (error: any) {
