@@ -6,7 +6,7 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx prisma migrate deploy && node dist/server.js",
-    "dev": "tsx src/server.ts"
+    "dev": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -36,7 +36,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "fluent-ffmpeg": "^2.1.3",
     "http": "^0.0.1-security",
     "http-errors": "^2.0.0",
     "middleware-http-errors": "^0.1.2",
