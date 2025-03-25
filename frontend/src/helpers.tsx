@@ -1,7 +1,17 @@
 import { jsPDF } from "jspdf";
 
+type Sections = {
+  title: string;
+  summary: string;
+  transcript: string;
+  flashcards: {
+    question: string;
+    answer: string;
+  }[];
+}[];
+
 // PDF DOWNLOAD FUNCTION
-export function handleDownload(sections) {
+export function handleDownload(sections: Sections) {
   const doc = new jsPDF();
   let y = 15;
 
@@ -35,13 +45,24 @@ export function handleDownload(sections) {
     y += 7;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    section.transcripts.forEach((t: { timestamp: string; text: string }) => {
-      const timestamp = `[${t.timestamp}]`;
-      const textLines = doc.splitTextToSize(t.text, 160); // reserve space for timestamp
-      doc.text(timestamp, 16, y);
-      doc.text(textLines, 35, y); // indent text to align
-      y += textLines.length * 6 + 2;
-    });
+    JSON.parse(section.transcript).forEach(
+      (t: { timestamp: string; text: string }) => {
+        const timestamp = `[${t.timestamp}]`;
+        const textLines = doc.splitTextToSize(t.text, 160); // reserve space for timestamp
+        doc.text(timestamp, 16, y);
+        doc.text(textLines, 35, y); // indent text to align
+        y += textLines.length * 6 + 2;
+
+        // Check if we need a new page before the next transcript item
+        if (y > 260) {
+          doc.addPage();
+          y = 15;
+          // Reset formatting for new page
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+        }
+      }
+    );
 
     y += 5;
 
@@ -52,16 +73,23 @@ export function handleDownload(sections) {
     y += 7;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    section.flashcards.forEach(
-      (fc: { question: string; answer: string }, idx: number) => {
-        const q = `Question ${idx + 1}: ${fc.question}`;
-        const a = `Answer: ${fc.answer}`;
-        doc.text(doc.splitTextToSize(q, 180), 16, y);
-        y += 6;
-        doc.text(doc.splitTextToSize(a, 180), 16, y);
-        y += 10;
+    section.flashcards.forEach((fc, idx) => {
+      const q = `Question ${idx + 1}: ${fc.question}`;
+      const a = `Answer: ${fc.answer}`;
+      doc.text(doc.splitTextToSize(q, 180), 16, y);
+      y += 6;
+      doc.text(doc.splitTextToSize(a, 180), 16, y);
+      y += 10;
+
+      // Check if we need a new page before the next flashcard
+      if (y > 260 && idx < section.flashcards.length - 1) {
+        doc.addPage();
+        y = 15;
+        // Reset formatting for new page
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
       }
-    );
+    });
 
     y += 7;
 
