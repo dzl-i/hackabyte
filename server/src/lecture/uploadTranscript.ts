@@ -1,7 +1,9 @@
 import { summarizeLecture } from "../gpt";
 import { createFlashcard, createLecture, createSection, getLectureDetail } from "../helper/lectureHelper";
+import { processVTT } from './vttRefiner';
 
 export async function lectureUploadTranscript(title: string, transcript: string) {
+  const refinedTranscript = processVTT(transcript); // change into {timestamp} {text} format
   const result: any = await summarizeLecture(transcript); // ChatGPT api call
 
   if (result.status !== 200) throw { status: 500, message: "An error occurred." };
