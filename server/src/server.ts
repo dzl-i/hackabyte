@@ -19,11 +19,9 @@ import { lectureUploadVideo } from './lecture/uploadVideo';
 import { lectureFlashcard } from './lecture/flashcard';
 import { processVTT } from './lecture/vttRefiner';
 
-
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
-
 
 // Set up web app using JSON
 const app = express();
