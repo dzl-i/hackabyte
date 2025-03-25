@@ -22,6 +22,21 @@ const flashcards = [
 const summary =
 	"Utilitarianism is a consequentialist ethical theory that holds the view that the morality of an action is determined by its outcomes—specifically, the extent to which it promotes overall happiness or minimizes suffering. Within this broader framework, Act Utilitarianism evaluates the morality of individual actions based on the direct consequences they produce. In contrast to Rule Utilitarianism, which assesses actions based on whether they align with rules that generally promote utility, Act Utilitarianism requires one to consider each situation uniquely."
 
+const transcript = [
+	{
+		timestamp: "00:01",
+		text: "Okay, so… Utilitarianism is what we call a consequentialist ethical theory.",
+	},
+	{
+		timestamp: "00:01",
+		text: "Okay, so… Utilitarianism is what we call a consequentialist ethical theory.",
+	},
+	{
+		timestamp: "00:01",
+		text: "Okay, so… Utilitarianism is what we call a consequentialist ethical theory.",
+	},
+]
+
 const lectureTabs = [
 	{
 		name: "Summary",
@@ -36,7 +51,12 @@ const lectureTabs = [
 	{
 		name: "Transcript",
 		icon: Captions,
-		content: <p className="text-white">Transcript</p>,
+		content: (
+			<div className="px-4">
+				<h4 className="text-lg font-bold text-white mb-4">Transcript</h4>
+				<p className="text-white">{summary}</p>
+			</div>
+		),
 	},
 	{
 		name: "Flashcards",
