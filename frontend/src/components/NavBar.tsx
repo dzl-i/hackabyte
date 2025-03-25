@@ -10,8 +10,8 @@ export default function NavBar() {
   return (
     <nav className="flex justify-between items-center py-4 px-6 border border-b border-white/15">
       <h1
+        className={`text-white font-bold text-2xl cursor-pointer uppercase ${bakbak.className}`}
         onClick={() => router.push("/")}
-        className={`text-white font-bold text-2xl uppercase cursor-pointer ${bakbak.className}`}
       >
         SmartScribe
       </h1>
