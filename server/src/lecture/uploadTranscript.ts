@@ -12,10 +12,10 @@ export async function lectureUploadTranscript(title: string, transcript: string)
   if (result.status !== 200) throw { status: 500, message: "An error occurred." };
   const response = await result.json();
 
-  const lecture = await createLecture(title);
+  const lecture = await createLecture(title, response.graph);
 
   for (const section of response.sections) {
-    const newSection = await createSection(lecture.id, section.title, section.transcript, section.summary, section.graph);
+    const newSection = await createSection(lecture.id, section.title, section.transcript, section.timestamp_start, section.timestamp_end, section.summary);
     if (newSection === null) throw { status: 500, message: "An error occurred." };
 
     for (const flashcard of section.flashcards) {
