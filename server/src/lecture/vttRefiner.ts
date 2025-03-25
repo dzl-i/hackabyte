@@ -1,8 +1,7 @@
-import * as fs from 'fs';
-
-export function processVTT(file: string): string {
+export function processVTT(file: string) {
   const lines = file.split('\n');
-  const result: string[] = [];
+  const refinedResult: { timestamp: string; text: string }[] = [];
+  const rawResult: string[] = [];
   const timestampRegex = /^(\d{2}:\d{2}:\d{2})\.\d{3}/;
   const textRegex = /^<v\s+[^>]+>\s*(.+)/;
 
@@ -17,9 +16,13 @@ export function processVTT(file: string): string {
 
     const textMatch = line.match(textRegex);
     if (textMatch && currentTimestamp) {
-      result.push(`${currentTimestamp} ${textMatch[1]}`);
+      rawResult.push(`${currentTimestamp} ${textMatch[1]}`);
+      refinedResult.push({ timestamp: currentTimestamp, text: textMatch[1] });
     }
   }
 
-  return result.join('\n');
+  return {
+    refinedResult,
+    rawResult: rawResult.join('\n')
+  }
 }
