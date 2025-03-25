@@ -12,12 +12,23 @@ import {
   CirclePlay,
   CirclePause,
   Loader,
+  TrendingUp,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import FlashCard from "@/components/FlashCard";
 import { handleDownload, truncate } from "@/helpers";
 import useQuery from "@/hooks/useRequest";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Cosmograph } from "@cosmograph/react";
 
 export default function Page() {
   // BACKEND CONNECTION
@@ -169,72 +180,98 @@ export default function Page() {
         </div>
       ) : (
         <>
-          <NavBar />
-          <main className="p-6 flex gap-8">
-            {/* Sidebar: Topics */}
-            <section className="space-y-6 flex-1 min-w-[280px]">
-              <button
-                onClick={() => router.back()}
-                className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 rounded-lg text-white cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
-              </button>
-              <div className="max-w-xs space-y-2">
-                <p className="text-white/75 font-bold uppercase">Sections</p>
-                <div className="flex flex-col gap-1">
-                  {data.sections?.map((section, index) => (
+          <Dialog>
+            <NavBar />
+            <main className="p-6 flex gap-8">
+              {/* Sidebar: Topics */}
+              <section className="space-y-6 flex-1 min-w-[280px]">
+                <button
+                  onClick={() => router.back()}
+                  className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 rounded-lg text-white cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
+                <div className="max-w-xs space-y-2">
+                  <p className="text-white/75 font-bold uppercase">Sections</p>
+                  <div className="flex flex-col gap-1">
+                    {data.sections?.map((section, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          stopSpeech();
+                          setTopicTab(section);
+                        }}
+                        className={`flex gap-2 px-4 py-2 rounded-lg duration-200 ${
+                          topicTab?.id === section.id
+                            ? "bg-[rgba(32,_33,_42,_1)] text-white font-bold"
+                            : "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
+                        }`}
+                      >
+                        <p>{truncate(section.title)}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Main Panel */}
+              <section className="space-y-4 w-full">
+                <div className="flex items-center justify-between mb-4">
+                  <h1 className="text-white font-bold text-2xl">
+                    {topicTab?.title}
+                  </h1>
+                  <div className="flex gap-2">
                     <button
-                      key={index}
-                      onClick={() => {
-                        stopSpeech();
-                        setTopicTab(section);
-                      }}
-                      className={`flex gap-2 px-4 py-2 rounded-lg duration-200 ${
-                        topicTab?.id === section.id
-                          ? "bg-[rgba(32,_33,_42,_1)] text-white font-bold"
+                      onClick={() => handleDownload(topicTab)}
+                      className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download All Sections
+                    </button>
+                    <DialogTrigger asChild>
+                      <button
+                        onClick={() => {}}
+                        className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                        Graph View
+                      </button>
+                    </DialogTrigger>
+                  </div>
+                  <DialogContent>
+                    <DialogTitle>Graph View</DialogTitle>
+                    <Cosmograph
+                      nodes={JSON.parse(data?.graph)?.nodes?.map((node) => ({
+                        id: node.title,
+                        color: "#ffffff",
+                      }))}
+                      links={JSON.parse(data?.graph)?.edges}
+                      nodeColor={(d) => d.color}
+                      nodeSize={10}
+                      linkWidth={2}
+                    />
+                  </DialogContent>
+                </div>
+
+                <div className="flex gap-2">
+                  {lectureTabs.map((tab, index) => (
+                    <button
+                      key={tab.name}
+                      onClick={() => setSelectedTabIndex(index)}
+                      className={`flex justify-center items-center gap-2 px-4 py-2 rounded-lg duration-200 ${
+                        selectedTabIndex === index
+                          ? "bg-[rgba(32,_33,_42,_1)] text-white"
                           : "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
                       }`}
                     >
-                      <p>{truncate(section.title)}</p>
+                      <tab.icon className="h-4 w-4" /> {tab.name}
                     </button>
                   ))}
                 </div>
-              </div>
-            </section>
-
-            {/* Main Panel */}
-            <section className="space-y-4 w-full">
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-white font-bold text-2xl">
-                  {topicTab?.title}
-                </h1>
-                <button
-                  onClick={() => handleDownload(sections)}
-                  className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
-                >
-                  <Download className="h-4 w-4" />
-                  Download All Sections
-                </button>
-              </div>
-
-              <div className="flex gap-2">
-                {lectureTabs.map((tab, index) => (
-                  <button
-                    key={tab.name}
-                    onClick={() => setSelectedTabIndex(index)}
-                    className={`flex justify-center items-center gap-2 px-4 py-2 rounded-lg duration-200 ${
-                      selectedTabIndex === index
-                        ? "bg-[rgba(32,_33,_42,_1)] text-white"
-                        : "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
-                    }`}
-                  >
-                    <tab.icon className="h-4 w-4" /> {tab.name}
-                  </button>
-                ))}
-              </div>
-              {selectedTab.content}
-            </section>
-          </main>
+                {selectedTab.content}
+              </section>
+            </main>
+          </Dialog>
         </>
       )}
     </main>
