@@ -98,11 +98,12 @@ export default function Page() {
 							<button
 								key={tab.name}
 								onClick={() => setSelectedTab(tab)}
-								className={`flex justify-center items-center gap-2 text-white px-4 py-2 relative cursor-pointer overflow-clip rounded-lg ${
+								className={`flex justify-center items-center gap-2 px-4 py-2 relative cursor-pointer overflow-clip rounded-lg duration-200
+                ${
 									selectedTab.name === tab.name
-										? "bg-[rgba(32,_33,_42,_1)]"
-										: "hover:bg-[rgba(32,_33,_42,_1)]"
-								} duration-200`}
+										? "bg-[rgba(32,_33,_42,_1)] text-white"
+										: "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
+								}`}
 							>
 								<tab.icon className="h-4 w-4" /> {tab.name}
 							</button>
