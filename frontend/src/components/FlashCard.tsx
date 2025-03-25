@@ -17,7 +17,7 @@ function FlashCard({ question, answer }: { question: string; answer: string }) {
   useEffect(() => {
     if (cardRef.current) {
       gsap.to(cardRef.current, {
-        rotationY: flipped ? 180 : 0,
+        rotationX: flipped ? 180 : 0,
         duration: 0.6,
         ease: "power2.inOut",
       });
@@ -49,7 +49,7 @@ function FlashCard({ question, answer }: { question: string; answer: string }) {
           className="absolute w-full h-full flex items-center justify-center bg-[#20212A] rounded-lg"
           style={{
             backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
+            transform: "rotateX(180deg)",
           }}
         >
           <p className="text-md text-white p-4">{answer}</p>
