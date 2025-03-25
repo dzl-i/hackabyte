@@ -6,7 +6,7 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx prisma migrate deploy && node dist/server.js",
-    "dev": "tsx src/server.ts"
+    "dev": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,12 +14,13 @@
   "description": "",
   "devDependencies": {
     "@babel/core": "^7.26.10",
-    "@types/cookie-parser": "^1.4.8",
+    "@types/axios": "^0.9.36",
     "@types/cors": "^2.8.17",
     "@types/eslint": "^9.6.1",
     "@types/express": "^5.0.1",
     "@types/http-errors": "^2.0.4",
     "@types/morgan": "^1.9.9",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.13.13",
     "eslint": "^9.23.0",
     "nodemon": "^3.1.9",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "axios": "^1.8.4",
     "chromadb": "^2.0.1",
     "chromadb-default-embed": "^2.14.0",
     "cors": "^2.8.5",
@@ -38,6 +40,7 @@
     "http-errors": "^2.0.0",
     "middleware-http-errors": "^0.1.2",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.2",
     "openai": "^4.89.0",
     "swagger-ui-express": "^5.0.1",
     "sync-request": "^6.1.0",
