@@ -36,7 +36,7 @@ export const groupTranscripts = async (lectureId: string) => {
     include: ["documents", "metadatas", "embeddings"],
   });
 
-  clustersTranscripts(
+  return clustersTranscripts(
     transcripts.documents,
     transcripts.metadatas,
     transcripts.embeddings,
@@ -92,7 +92,7 @@ const clustersTranscripts = (documents, metadatas, embeddings, threshold) => {
     clusters.push(cluster);
   }
 
-  console.log(JSON.stringify(clusters));
+  return clusters;
 };
 
 export const addTranscripts = async (transcripts: Transcript[]) => {
