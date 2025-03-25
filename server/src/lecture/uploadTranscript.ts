@@ -23,9 +23,11 @@ export async function lectureUploadTranscript(title: string, transcript: string)
   console.log(graph);
   console.log('RAHHHHHHHHHH GRAPH\n');
 
+  const lecture = await createLecture(title, JSON.stringify(graph));
+
   const resLen = listedTranscript.length
   for (const section of sections) {
-    const sectionTranscript: { timestamp: string; text: string }[] = [];
+    const sectionTranscript: any = [];
     let start = section.timestamp_start;
     const end = section.timestamp_end;
     for (let i = 0; i < resLen; i++) {
@@ -33,12 +35,8 @@ export async function lectureUploadTranscript(title: string, transcript: string)
       sectionTranscript.push(listedTranscript[i]);
       start = listedTranscript[i].timestamp;
     }
-  }
 
-  const lecture = await createLecture(title, graph);
-
-  for (const section of sections) {
-    const newSection = await createSection(lecture.id, section.title, section.transcript, section.timestamp_start, section.timestamp_end, section.summary);
+    const newSection = await createSection(lecture.id, section.title, JSON.stringify(sectionTranscript), section.timestamp_start, section.timestamp_end, section.summary);
     if (newSection === null) throw { status: 500, message: "An error occurred in uploadTranscript 2." };
 
     for (const flashcard of section.flashcards) {
@@ -49,6 +47,5 @@ export async function lectureUploadTranscript(title: string, transcript: string)
 
   const lectureDetails = await getLectureDetail(lecture.id);
   if (lectureDetails === null) throw { status: 500, message: "An error occurred in uploadTranscript 4." };
-
   return lectureDetails;
 }
