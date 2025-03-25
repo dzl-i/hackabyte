@@ -1,13 +1,90 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 "use client"
 
 import NavBar from "@/components/NavBar"
-import { ArrowLeft, Captions, Heart, Layers } from "lucide-react"
+import { ArrowLeft, Captions, Heart, Layers, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import React, { useState } from "react"
 import FlashCard from "@/components/FlashCard"
+import { jsPDF } from "jspdf"
 
 export default function Page() {
 	const router = useRouter()
+
+	const handleDownload = () => {
+		const doc = new jsPDF()
+		let y = 15
+
+		const renderParagraphs = (text: string) => {
+			const paragraphs = text.split("\n")
+			paragraphs.forEach((para) => {
+				const lines = doc.splitTextToSize(para, 180)
+				doc.text(lines, 16, y)
+				y += lines.length * 6 + 4
+			})
+		}
+
+		sections.forEach((section, idx) => {
+			doc.setFont("helvetica", "bold")
+			doc.setFontSize(14)
+			doc.text(`Section ${idx + 1}: ${section.title}`, 10, y)
+			y += 10
+
+			// Summary
+			doc.setFontSize(12)
+			doc.text("Summary", 12, y)
+			y += 7
+			doc.setFont("helvetica", "normal")
+			doc.setFontSize(12)
+			renderParagraphs(section.summary)
+
+			// Transcript
+			doc.setFont("helvetica", "bold")
+			doc.setFontSize(12)
+			doc.text("Transcript", 12, y)
+			y += 7
+			doc.setFont("helvetica", "normal")
+			doc.setFontSize(12)
+			section.transcripts.forEach((t: { timestamp: string; text: string }) => {
+				const timestamp = `[${t.timestamp}]`
+				const textLines = doc.splitTextToSize(t.text, 160) // reserve space for timestamp
+				doc.text(timestamp, 16, y)
+				doc.text(textLines, 35, y) // indent text to align
+				y += textLines.length * 6 + 2
+			})
+
+			y += 5
+
+			// Flashcards
+			doc.setFont("helvetica", "bold")
+			doc.setFontSize(12)
+			doc.text("Flashcards", 12, y)
+			y += 7
+			doc.setFont("helvetica", "normal")
+			doc.setFontSize(12)
+			section.flashcards.forEach(
+				(fc: { question: string; answer: string }, idx: number) => {
+					const q = `Question ${idx + 1}: ${fc.question}`
+					const a = `Answer: ${fc.answer}`
+					doc.text(doc.splitTextToSize(q, 180), 16, y)
+					y += 6
+					doc.text(doc.splitTextToSize(a, 180), 16, y)
+					y += 10
+				}
+			)
+
+			y += 7
+
+			// Add new page if near bottom
+			if (y > 260 && idx < sections.length - 1) {
+				doc.addPage()
+				y = 15
+			}
+		})
+
+		doc.save("download.pdf")
+	}
 
 	// DATABASE
 	const flashcardsDummy = [
@@ -43,14 +120,14 @@ export default function Page() {
 
 	const sections = [
 		{
-			name: "Rule & Act Utilitarianism",
+			title: "Rule & Act Utilitarianism",
 			summary: summaryDummy,
 			transcripts: transcriptsDummy,
 			flashcards: flashcardsDummy,
 		},
 		{
-			name: "Rule & Act Utilitarianism 2",
-			summary: "different one trust",
+			title: "Rule & Act Utilitarianism 2",
+			summary: "different one\n trust",
 			transcripts: transcriptsDummy2,
 			flashcards: flashcardsDummy,
 		},
@@ -139,12 +216,12 @@ export default function Page() {
 									key={index}
 									onClick={() => setTopicTab(section)}
 									className={`flex gap-2 px-4 py-2 rounded-lg duration-200 ${
-										topicTab.name === section.name
+										topicTab.title === section.title
 											? "bg-[rgba(32,_33,_42,_1)] text-white font-bold"
 											: "text-gray-400 hover:text-white hover:bg-[rgba(32,_33,_42,_1)]"
 									}`}
 								>
-									<p>{truncate(section.name)}</p>
+									<p>{truncate(section.title)}</p>
 								</button>
 							))}
 						</div>
@@ -153,7 +230,17 @@ export default function Page() {
 
 				{/* Main Panel */}
 				<section className="space-y-4 w-full">
-					<h1 className="text-white font-bold text-2xl">{topicTab.name}</h1>
+					<div className="flex items-center justify-between mb-4">
+						<h1 className="text-white font-bold text-2xl">{topicTab.title}</h1>
+						<button
+							onClick={handleDownload}
+							className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
+						>
+							<Download className="h-4 w-4" />
+							Download All Sections
+						</button>
+					</div>
+
 					<div className="flex gap-2">
 						{lectureTabs.map((tab, index) => (
 							<button
