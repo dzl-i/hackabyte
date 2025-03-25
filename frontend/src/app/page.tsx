@@ -10,17 +10,17 @@ import LectureItem from "@/components/LectureItem";
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
 
-const lectures = [
-  { id: "1", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { id: "2", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { id: "3", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { id: "4", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { id: "5", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  { id: "6", name: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-];
-
 export default function Home() {
   const router = useRouter();
+
+  const lectures = [
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
+  ];
 
   return (
     <main className="flex flex-col justify-evenly items-center min-h-screen overflow-hidden p-6 py-16 gap-16">
