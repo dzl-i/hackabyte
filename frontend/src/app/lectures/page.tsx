@@ -1,27 +1,37 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import LectureItem from "@/components/LectureItem";
+import LectureItem, { Lecture } from "@/components/LectureItem";
 import NavBar from "@/components/NavBar";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const STORAGE_KEY = "submissions";
+
 function page() {
   const router = useRouter();
 
-  const lectures = [
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Lecture 1", lastUpdated: "Uploaded 2 hours ago" },
-    { title: "Lecture 2", lastUpdated: "Uploaded 3 hours ago" },
-    { title: "Lecture 3", lastUpdated: "Uploaded 4 hours ago" },
-    { title: "Lecture 4", lastUpdated: "Uploaded 5 hours ago" },
-    { title: "Lecture 5", lastUpdated: "Uploaded 6 hours ago" },
-  ];
-
+  const [submissions, setSubmissions] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  const filterLectures = lectures.filter((lecture) =>
-    lecture.title.toLowerCase().includes(searchText.toLowerCase())
+  // Load submissions from localStorage on mount
+  useEffect(() => {
+    const loadSubmissions = () => {
+      const storedSubmissions = localStorage.getItem(STORAGE_KEY);
+      if (storedSubmissions) {
+        setSubmissions(JSON.parse(storedSubmissions));
+      }
+    };
+
+    loadSubmissions();
+  }, []);
+
+  const filteredSubmissions = useMemo(
+    () =>
+      submissions.filter((submission: Lecture) =>
+        submission.title.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [submissions]
   );
 
   return (
@@ -47,8 +57,8 @@ function page() {
         </div>
 
         <div className="space-y-2 w-full">
-          {filterLectures.length > 0 ? (
-            filterLectures.map((lecture, index) => (
+          {filteredSubmissions.length > 0 ? (
+            filteredSubmissions.map((lecture, index) => (
               <LectureItem key={index} lecture={lecture} />
             ))
           ) : (
