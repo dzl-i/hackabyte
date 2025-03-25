@@ -1,33 +1,57 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Video } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Captions } from "lucide-react";
 import StarGrid from "@/components/StarGrid";
 import { Bakbak_One, Azeret_Mono } from "next/font/google";
 import { useRouter } from "next/navigation";
-import LectureItem from "@/components/LectureItem";
+import LectureItem, { Lecture } from "@/components/LectureItem";
 import { toast } from "sonner";
 import { request } from "../hooks/useRequest";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
 
+const STORAGE_KEY = "submissions";
+
 export default function Home() {
   const router = useRouter();
 
   const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
-  const [submissions, setSubmissions] = useState([]);
+  const [submissions, setSubmissions] = useState<Lecture[]>([]);
 
-  const lectures = [
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-    { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
-  ];
+  // Load submissions from localStorage on mount
+  useEffect(() => {
+    const loadSubmissions = () => {
+      const storedSubmissions = localStorage.getItem(STORAGE_KEY);
+      if (storedSubmissions) {
+        setSubmissions(JSON.parse(storedSubmissions));
+      }
+    };
+
+    loadSubmissions();
+  }, []);
+
+  const addSubmissionToStorage = (newSubmission: Lecture) => {
+    const storedSubmissions = localStorage.getItem(STORAGE_KEY);
+    let updatedSubmissions: Set<Lecture> = new Set();
+
+    // Get current submission
+    if (storedSubmissions) {
+      updatedSubmissions = new Set(JSON.parse(storedSubmissions) as Lecture[]);
+    }
+
+    // Add new submission
+    updatedSubmissions = updatedSubmissions.add(newSubmission);
+
+    const newSubmissions: Lecture[] = Array.from(updatedSubmissions);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSubmissions));
+
+    // Update state
+    setSubmissions(newSubmissions);
+  };
 
   const uploadVideo = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -42,6 +66,11 @@ export default function Home() {
     if (error) {
       toast("Error uploading video");
     } else {
+      addSubmissionToStorage({
+        id: data.id,
+        title: data.title,
+        createdAt: data.createdAt,
+      });
       toast("Video successfully uploaded!");
     }
 
@@ -68,26 +97,15 @@ export default function Home() {
     if (error) {
       toast("Error uploading transcript");
     } else {
+      addSubmissionToStorage({
+        id: data.id,
+        title: data.title,
+        createdAt: data.createdAt,
+      });
       toast("Transcript successfully uploaded!");
     }
 
     setIsLoadingTranscript(false);
-  };
-
-  const getSubmissions = async () => {
-    try {
-      const res = await fetch("/lectures", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      setSubmissions(data);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const okTest = () => {
@@ -189,24 +207,26 @@ export default function Home() {
       </div>
 
       {/* Past submissions part */}
-      <div className="w-full max-w-4xl space-y-6">
-        <div className="flex justify-between items-center">
-          <p className="text-xl font-bold text-white">Past Submissions</p>
+      {submissions.length && (
+        <div className="w-full max-w-4xl space-y-6">
+          <div className="flex justify-between items-center">
+            <p className="text-xl font-bold text-white">Past Submissions</p>
 
-          <button
-            className="flex text-white items-center hover:underline duration-200 gap-1 cursor-pointer"
-            onClick={() => router.push("/lectures")}
-          >
-            See More <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+            <button
+              className="flex text-white items-center hover:underline duration-200 gap-1 cursor-pointer"
+              onClick={() => router.push("/lectures")}
+            >
+              See More <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
 
-        <div className="space-y-2 w-full">
-          {lectures.map((lecture, index) => (
-            <LectureItem key={index} lecture={lecture} />
-          ))}
+          <div className="space-y-2 w-full">
+            {submissions.slice(0, 3).map((lecture, index) => (
+              <LectureItem key={index} lecture={lecture} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }
