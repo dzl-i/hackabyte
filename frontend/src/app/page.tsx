@@ -108,10 +108,6 @@ export default function Home() {
     setIsLoadingTranscript(false);
   };
 
-  const okTest = () => {
-    toast("Video successfully uploaded!");
-  };
-
   return (
     <main className="flex flex-col justify-evenly items-center min-h-screen overflow-hidden p-6 py-16 gap-16">
       <StarGrid />

@@ -22,9 +22,6 @@ import useQuery from "@/hooks/useRequest";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -36,7 +33,7 @@ export default function Page() {
   const params = useParams();
 
   // GET DATA FROM BACKEND
-  const { data, error, isLoading } = useQuery(`/lecture/${params.id}`);
+  const { data, isLoading } = useQuery(`/lecture/${params.id}`);
 
   // STATE INITIALISATION - Topic Section and tab state
   const [topicTab, setTopicTab] = useState(data ? data.sections[0] : undefined);
@@ -172,9 +169,13 @@ export default function Page() {
   // Give the details of currently selected lecture tab
   const selectedTab = lectureTabs[selectedTabIndex];
 
+  if (data) {
+    console.log(JSON.parse(data?.graph));
+  }
+
   return (
     <main>
-      {!topicTab && isLoading ? (
+      {!data && !topicTab && isLoading ? (
         <div className="flex justify-center items-center h-screen w-screen">
           <Loader className="w-10 h-10 text-white animate-spin" />
         </div>
@@ -222,7 +223,7 @@ export default function Page() {
                   </h1>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleDownload(topicTab)}
+                      onClick={() => handleDownload(data.sections)}
                       className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
                     >
                       <Download className="h-4 w-4" />
@@ -243,12 +244,13 @@ export default function Page() {
                     <Cosmograph
                       nodes={JSON.parse(data?.graph)?.nodes?.map((node) => ({
                         id: node.title,
-                        color: "#ffffff",
                       }))}
                       links={JSON.parse(data?.graph)?.edges}
-                      nodeColor={(d) => d.color}
-                      nodeSize={10}
+                      nodeSize={2}
                       linkWidth={2}
+                      simulationLinkDistance={4}
+                      nodeLabelColor="#ffffff"
+                      hoveredNodeLabelColor="#e8e8e8"
                     />
                   </DialogContent>
                 </div>

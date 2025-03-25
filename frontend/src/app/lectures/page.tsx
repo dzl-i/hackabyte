@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 const STORAGE_KEY = "submissions";
 
-function page() {
+export default function Page() {
   const router = useRouter();
 
   const [submissions, setSubmissions] = useState([]);
@@ -31,7 +31,7 @@ function page() {
       submissions.filter((submission: Lecture) =>
         submission.title.toLowerCase().includes(searchText.toLowerCase())
       ),
-    [submissions]
+    [submissions, searchText]
   );
 
   return (
@@ -69,5 +69,3 @@ function page() {
     </div>
   );
 }
-
-export default page;
