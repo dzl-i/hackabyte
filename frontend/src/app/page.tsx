@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import { Video } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Captions } from "lucide-react";
@@ -6,12 +7,16 @@ import StarGrid from "@/components/StarGrid";
 import { Bakbak_One, Azeret_Mono } from "next/font/google";
 import { useRouter } from "next/navigation";
 import LectureItem from "@/components/LectureItem";
+import { toast } from "sonner";
 
 const bakbak = Bakbak_One({ weight: "400", subsets: ["latin"] });
 const azeretMono = Azeret_Mono({ weight: "400", subsets: ["latin"] });
 
 export default function Home() {
   const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
 
   const lectures = [
     { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
@@ -21,6 +26,49 @@ export default function Home() {
     { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
     { title: "Rule Utalitarian", lastUpdated: "Uploaded 1 hour ago" },
   ];
+
+  const uploadVideo = async () => {
+    try {
+      const res = await fetch("/lecture/video", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      console.log("data " + data);
+
+      // setSubmissions((prev) -> [...prev, data])
+
+      toast("Video successfully uploaded!");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getSubmissions = async () => {
+    try {
+      const res = await fetch("/lectures", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      setSubmissions(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const okTest = () => {
+    toast("Video successfully uploaded!");
+  };
 
   return (
     <main className="flex flex-col justify-evenly items-center min-h-screen overflow-hidden p-6 py-16 gap-16">
