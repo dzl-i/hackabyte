@@ -72,7 +72,7 @@ app.get('/lecture/:id', async (req: Request, res: Response) => {
 // Upload lecture transcript
 app.post('/lecture/transcript', upload.single('file'), async (req: MulterRequest, res: Response) => {
   try {
-    const title = req.file?.originalname || '';
+    const title = req.file?.originalname.split(".")[0] || 'Name Unavailable';
     const transcript = req.file?.buffer.toString('utf8') || '';
 
     const lecture = await lectureUploadTranscript(title, transcript);
@@ -87,7 +87,7 @@ app.post('/lecture/transcript', upload.single('file'), async (req: MulterRequest
 // Upload lecture video
 app.post('/lecture/video', upload.single('file'), async (req: MulterRequest, res: Response) => {
   try {
-    const title = req.file?.originalname || '';
+    const title = req.file?.originalname.split(".")[0] || 'Name Unavailable';
     const video = req.file;
 
     if (!video) throw { status: 400, message: "Video file is required." };
