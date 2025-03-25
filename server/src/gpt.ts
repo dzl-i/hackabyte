@@ -44,6 +44,7 @@ export async function summarizeLecture(transcript: string) {
           { role: 'user', content: transcript }
         ],
         temperature: 0.7,
+        max_output_tokens: 16384,
       },
       {
         headers: {
