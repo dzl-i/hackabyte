@@ -27,14 +27,11 @@ export async function lectureUploadTranscript(title: string, transcript: string)
 
   const resLen = listedTranscript.length
   for (const section of sections) {
-    const sectionTranscript: any = [];
-    let start = section.timestamp_start;
-    const end = section.timestamp_end;
-    for (let i = 0; i < resLen; i++) {
-      if (start == end) break;
-      sectionTranscript.push(listedTranscript[i]);
-      start = listedTranscript[i].timestamp;
-    }
+    const start = listedTranscript.findIndex(item => item.timestamp === section.timestamp_start);
+    console.log('START is', start);
+    const end = listedTranscript.findIndex(item => item.timestamp === section.timestamp_end);
+    console.log('END is', end);
+    const sectionTranscript = start !== -1 && end !== -1 ? listedTranscript.slice(start, end + 1) : [];
 
     const newSection = await createSection(lecture.id, section.title, JSON.stringify(sectionTranscript), section.timestamp_start, section.timestamp_end, section.summary);
     if (newSection === null) throw { status: 500, message: "An error occurred in uploadTranscript 2." };
