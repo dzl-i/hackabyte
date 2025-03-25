@@ -6,7 +6,7 @@ dotenv.config();
 const API_KEY = process.env.OPENAI_API_KEY;
 
 const prompt = `
-This is a transcript of a lecture. It has already been divided up into sections.
+This is a transcript of a lecture.
 Summarise each section in 150 to 250 words, including a title.
 Each section should correspond to a 'start' and an 'end' timestamp, which are the timestamps of the first and the last quote of the section, respectively.
 In each section, make 4-6 flash cards with a question and answer to assist revision.
@@ -19,7 +19,6 @@ I want the response format to be JSON:
 {
   "sections": [{
       "title": string,
-      "transcript": [{"timestamp": string, "text": string}]
       "summary": string,
       "timestamp_start": string
       "timestamp_end": string,
@@ -32,10 +31,12 @@ I want the response format to be JSON:
 }
 `
 
+//       "transcript": [{"timestamp": string, "text": string}]
+
 export async function summarizeLecture(transcript: string) {
   try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/completions',
+    const response: any = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
       {
         model: 'gpt-4',
         messages: [
@@ -51,6 +52,8 @@ export async function summarizeLecture(transcript: string) {
         }
       }
     );
+
+    return await JSON.parse(response.data.choices[0].message.content);
   } catch (error) {
       console.error('Error summarizing the lecture:', error);
       throw new Error('Failed to summarize lecture');
