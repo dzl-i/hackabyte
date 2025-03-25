@@ -27,34 +27,33 @@ interface MulterRequest extends Request {
 
 // Set up web app using JSON
 const app = express();
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 const httpServer = new Server(app);
 
 // Use middleware that allows for access from other domains
-app.use(cors({
-  origin: ["http://localhost:3001"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:3001"],
+    credentials: true,
+  })
+);
 
-
-const PORT: number = parseInt(process.env.PORT || '3000');
+const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction: boolean = process.env.NODE_ENV === "production";
 
-const swaggerDocument = YAML.load(path.join(__dirname, '../api-docs.yaml'));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+const swaggerDocument = YAML.load(path.join(__dirname, "../api-docs.yaml"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ///////////////////////// ROUTES /////////////////////////
 
-
 // HEALTH CHECK ROUTE
-app.get('/', async (req: Request, res: Response) => {
-  console.log("Health check")
+app.get("/", async (req: Request, res: Response) => {
+  console.log("Health check");
   res.status(200).json({
-    message: "Server is up!"
+    message: "Server is up!",
   });
 });
 
@@ -124,10 +123,8 @@ app.post('/lecture/flashcard', async (req: Request, res: Response) => {
 
 ///////////////////////// SERVER /////////////////////////
 
-
 // Logging errors
-app.use(morgan('dev'));
-
+app.use(morgan("dev"));
 app.use(errorHandler());
 
 // Start server
@@ -136,6 +133,6 @@ const server = httpServer.listen(PORT, () => {
 });
 
 // For coverage, handle Ctrl+C
-process.on('SIGINT', () => {
-  server.close(() => console.log('Shutting down server.'));
+process.on("SIGINT", () => {
+  server.close(() => console.log("Shutting down server."));
 });
