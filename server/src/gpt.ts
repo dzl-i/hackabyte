@@ -38,7 +38,7 @@ export async function summarizeLecture(transcript: string) {
     const response: any = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: prompt },
           { role: 'user', content: transcript }
