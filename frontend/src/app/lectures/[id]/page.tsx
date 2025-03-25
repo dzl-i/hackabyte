@@ -3,118 +3,27 @@
 "use client"
 
 import NavBar from "@/components/NavBar"
-import { ArrowLeft, Captions, Heart, Layers, Download } from "lucide-react"
+import {
+	ArrowLeft,
+	Captions,
+	Heart,
+	Layers,
+	Download,
+	CirclePlay,
+	CirclePause,
+} from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import FlashCard from "@/components/FlashCard"
-import { jsPDF } from "jspdf"
+import { handleDownload, truncate } from "@/helpers"
 
 export default function Page() {
-	const router = useRouter()
-	const id = useParams().id
-	// const [sections, setSections] = useState([]);
-
-	const getSections = async () => {
-		try {
-			const res = await fetch(`/lecture/${id}`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			})
-
-			const data = await res.json()
-
-			console.log("data " + data)
-			// setSections(data);
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	const handleDownload = () => {
-		const doc = new jsPDF()
-		let y = 15
-
-		const renderParagraphs = (text: string) => {
-			const paragraphs = text.split("\n")
-			paragraphs.forEach((para) => {
-				const lines = doc.splitTextToSize(para, 180)
-				doc.text(lines, 16, y)
-				y += lines.length * 6 + 4
-			})
-		}
-
-		sections.forEach((section, idx) => {
-			doc.setFont("helvetica", "bold")
-			doc.setFontSize(14)
-			doc.text(`Section ${idx + 1}: ${section.title}`, 10, y)
-			y += 10
-
-			// Summary
-			doc.setFontSize(12)
-			doc.text("Summary", 12, y)
-			y += 7
-			doc.setFont("helvetica", "normal")
-			doc.setFontSize(12)
-			renderParagraphs(section.summary)
-
-			// Transcript
-			doc.setFont("helvetica", "bold")
-			doc.setFontSize(12)
-			doc.text("Transcript", 12, y)
-			y += 7
-			doc.setFont("helvetica", "normal")
-			doc.setFontSize(12)
-			section.transcripts.forEach((t: { timestamp: string; text: string }) => {
-				const timestamp = `[${t.timestamp}]`
-				const textLines = doc.splitTextToSize(t.text, 160) // reserve space for timestamp
-				doc.text(timestamp, 16, y)
-				doc.text(textLines, 35, y) // indent text to align
-				y += textLines.length * 6 + 2
-			})
-
-			y += 5
-
-			// Flashcards
-			doc.setFont("helvetica", "bold")
-			doc.setFontSize(12)
-			doc.text("Flashcards", 12, y)
-			y += 7
-			doc.setFont("helvetica", "normal")
-			doc.setFontSize(12)
-			section.flashcards.forEach(
-				(fc: { question: string; answer: string }, idx: number) => {
-					const q = `Question ${idx + 1}: ${fc.question}`
-					const a = `Answer: ${fc.answer}`
-					doc.text(doc.splitTextToSize(q, 180), 16, y)
-					y += 6
-					doc.text(doc.splitTextToSize(a, 180), 16, y)
-					y += 10
-				}
-			)
-
-			y += 7
-
-			// Add new page if near bottom
-			if (y > 260 && idx < sections.length - 1) {
-				doc.addPage()
-				y = 15
-			}
-		})
-
-		doc.save("download.pdf")
-	}
-
 	// DATABASE
 	const flashcardsDummy = [
 		{ question: "how is merry's mental state?", answer: "not good" },
 		{ question: "how is merry's mental state?", answer: "not good" },
 		{ question: "how is merry's mental state?", answer: "not good" },
 	]
-
-	const summaryDummy =
-		"Utilitarianism is a consequentialist ethical theory that holds the view that the morality of an action is determined by its outcomes—specifically, the extent to which it promotes overall happiness or minimizes suffering..."
 
 	const transcriptsDummy = [
 		{
@@ -141,7 +50,8 @@ export default function Page() {
 	const sections = [
 		{
 			title: "Rule & Act Utilitarianism",
-			summary: summaryDummy,
+			summary:
+				"Utilitarianism is a consequentialist ethical theory that holds the view that the morality of an action is determined by its outcomes—specifically, the extent to which it promotes overall happiness or minimizes suffering...",
 			transcripts: transcriptsDummy,
 			flashcards: flashcardsDummy,
 		},
@@ -153,18 +63,104 @@ export default function Page() {
 		},
 	]
 
-	// Section and tab state
+	// STATE INITIALISATION - Topic Section and tab state
 	const [topicTab, setTopicTab] = useState(sections[0])
 	const [selectedTabIndex, setSelectedTabIndex] = useState(0)
 
-	// Dynamically generates lecture type tab
+	// BACKEND CONNECTION
+	const router = useRouter()
+	const id = useParams().id
+	const getSections = async () => {
+		try {
+			const res = await fetch(`/lecture/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+
+			const data = await res.json()
+
+			console.log("data " + data)
+			// setSections(data);
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	// AUDIO
+	const [isSpeaking, setIsSpeaking] = useState(false)
+	const utteranceRef = useRef(null)
+
+	const stopSpeech = () => {
+		window.speechSynthesis.cancel()
+		setIsSpeaking(false)
+	}
+
+	const getCurrentTabText = () => {
+		if (selectedTabIndex === 0) {
+			return topicTab.summary
+		} else if (selectedTabIndex === 1) {
+			return topicTab.transcripts.map((t) => t.text).join(" ")
+		}
+		return ""
+	}
+
+	const handleTTS = () => {
+		if (isSpeaking) {
+			window.speechSynthesis.cancel()
+			setIsSpeaking(false)
+			return
+		}
+
+		const utterance = new SpeechSynthesisUtterance(getCurrentTabText())
+		utteranceRef.current = utterance
+
+		window.speechSynthesis.speak(utterance)
+		setIsSpeaking(true)
+
+		utterance.onend = () => {
+			setIsSpeaking(false)
+		}
+	}
+
+	useEffect(() => {
+		stopSpeech() // Stop speech when switching tab
+	}, [selectedTabIndex])
+
+	const audioButton = () => {
+		return (
+			<button
+				onClick={handleTTS}
+				className="flex items-center gap-2 py-1 px-3 duration-200 hover:bg-white/5  rounded-lg text-white cursor-pointer"
+			>
+				{isSpeaking ? (
+					<>
+						<CirclePause className="w-4 h-4" />
+						Pause Audio
+					</>
+				) : (
+					<>
+						<CirclePlay className="w-4 h-4" />
+						Play Audio
+					</>
+				)}
+			</button>
+		)
+	}
+
+	// LECTURE TAB
 	const lectureTabs = [
 		{
 			name: "Summary",
 			icon: Heart,
 			content: (
 				<div className="px-4">
-					<h4 className="text-lg font-bold text-white mb-4">Summary</h4>
+					<div className="flex items-center mb-4 gap-2">
+						<h4 className="text-lg font-bold text-white">Summary</h4>
+						{audioButton()}
+					</div>
+
 					<p className="text-white">{topicTab.summary}</p>
 				</div>
 			),
@@ -174,7 +170,10 @@ export default function Page() {
 			icon: Captions,
 			content: (
 				<div className="px-4">
-					<h4 className="text-lg font-bold text-white mb-4">Transcript</h4>
+					<div className="flex items-center mb-4 gap-2">
+						<h4 className="text-lg font-bold text-white">Transcript</h4>
+						{audioButton()}
+					</div>
 					<div className="grid grid-cols-[80px_1fr] gap-y-2">
 						{topicTab.transcripts.map((transcript, index) => (
 							<React.Fragment key={index}>
@@ -209,12 +208,8 @@ export default function Page() {
 		},
 	]
 
+	// Give the details of currently selected lecture tab
 	const selectedTab = lectureTabs[selectedTabIndex]
-
-	function truncate(str: string) {
-		const limit = 25
-		return str.length > limit ? str.slice(0, limit) + "…" : str
-	}
 
 	return (
 		<main>
@@ -234,7 +229,10 @@ export default function Page() {
 							{sections.map((section, index) => (
 								<button
 									key={index}
-									onClick={() => setTopicTab(section)}
+									onClick={() => {
+										stopSpeech()
+										setTopicTab(section)
+									}}
 									className={`flex gap-2 px-4 py-2 rounded-lg duration-200 ${
 										topicTab.title === section.title
 											? "bg-[rgba(32,_33,_42,_1)] text-white font-bold"
@@ -253,7 +251,7 @@ export default function Page() {
 					<div className="flex items-center justify-between mb-4">
 						<h1 className="text-white font-bold text-2xl">{topicTab.title}</h1>
 						<button
-							onClick={handleDownload}
+							onClick={() => handleDownload(sections)}
 							className="flex items-center gap-2 py-2 px-4 duration-200 hover:bg-white/5 border border-white/10 rounded-lg text-white cursor-pointer"
 						>
 							<Download className="h-4 w-4" />
