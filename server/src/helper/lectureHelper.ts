@@ -16,21 +16,23 @@ export async function getLectureDetail(id: string) {
   });
 }
 
-export async function createLecture(title: string) {
+export async function createLecture(title: string, graph: string) {
   return await prisma.lecture.create({
     data: {
       title: title,
+      graph: graph,
     }
   });
 }
 
-export async function createSection(lectureId: string, title: string, transcript: string, summary: string, graph: string) {
+export async function createSection(lectureId: string, title: string, transcript: string, timestamp_start: string, timestamp_end: string, summary: string) {
   return await prisma.section.create({
     data: {
       title: title,
       transcript: transcript,
+      timestamp_start: timestamp_start,
+      timestamp_end: timestamp_end,
       summary: summary,
-      graph: graph,
       lecture: {
         connect: {
           id: lectureId

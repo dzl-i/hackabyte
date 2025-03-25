@@ -16,19 +16,21 @@ datasource db {
 model Lecture {
   id        String    @id @default(uuid())
   title     String
+  graph     String
   sections  Section[]
   createdAt DateTime  @default(now())
 }
 
 model Section {
-  id         String      @id @default(uuid())
-  title      String
-  transcript String
-  summary    String
-  flashcards Flashcard[]
-  graph      String
-  lecture    Lecture     @relation(fields: [lectureId], references: [id])
-  lectureId  String
+  id              String      @id @default(uuid())
+  title           String
+  transcript      String
+  timestamp_start String
+  timestamp_end   String
+  summary         String
+  flashcards      Flashcard[]
+  lecture         Lecture     @relation(fields: [lectureId], references: [id])
+  lectureId       String
 }
 
 model Flashcard {
