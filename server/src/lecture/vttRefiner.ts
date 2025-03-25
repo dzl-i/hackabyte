@@ -1,9 +1,7 @@
 import * as fs from 'fs';
 
-export function processVTT(filePath: string): string {
-  const vttContent = fs.readFileSync(filePath, 'utf-8');
-  
-  const lines = vttContent.split('\n');
+export function processVTT(file: string): string {
+  const lines = file.split('\n');
   const result: string[] = [];
   const timestampRegex = /^(\d{2}:\d{2}:\d{2})\.\d{3}/;
   const textRegex = /^<v\s+[^>]+>\s*(.+)/;
