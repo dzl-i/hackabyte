@@ -7,3 +7,5 @@ AI-powered study companion that transforms lecture videos and transcripts into c
 * Multi-modal Learning: Supports different learning styles with visual, text, and audio materials
 * Text To Speech: Converts text summaries to speech for auditory learners or on-the-go studying Students simply upload their lecture video or transcript, and within minutes, SmartScribe processes the content and generates all these study materials automatically.
 * PDF Export: Allows students to download all generated study materials as a structured PDF for offline studying
+
+[Project demo link](https://devpost.com/software/studyscribe-eo73sa)
